@@ -25,19 +25,23 @@ public class JackAnalyzer {
 
     private static void compile(File input, File location) throws FileNotFoundException {
         JackTokenizer tokenizer = new JackTokenizer(input);
-        File output = new File(location, input.getName().replaceAll(".jack", ".myT.xml"));
+        File output = new File(location, input.getName().replaceAll(".jack", ".my.xml"));
 
         FileWriter writer = null;
         try {
             writer = new FileWriter(output);
-            writer.write("<tokens>\n");
+            CompilationEngine compiler = new CompilationEngine(tokenizer, writer);
+            compiler.compileClass();
 
-            while(tokenizer.advance()){
-                TokenType type = tokenizer.tokenType();
-                String line = type.wrap(tokenizer.token());
-                writer.write(line+"\n");
-            }
-            writer.write("</tokens>\n");
+
+//            writer.write("<tokens>\n");
+//
+//            while(tokenizer.advance()){
+//                TokenType type = tokenizer.tokenType();
+//                String line = type.wrap(tokenizer.token());
+//                writer.write(line+"\n");
+//            }
+//            writer.write("</tokens>\n");
         }
         catch (IOException e) {
             System.out.println("Failed writing to output stream: "+e.getMessage());

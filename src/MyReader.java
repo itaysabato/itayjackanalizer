@@ -15,12 +15,11 @@ import java.util.Scanner;
 public class MyReader implements Readable{
 
     private ArrayList<String> strings;
-    Scanner source;
-
-    int i= 0;
-
-    String buf="";
-    boolean lookfor = false ;
+    private Scanner source;
+    private int i= 0;
+    private String buf="";
+   private  boolean lookfor = false ;
+    
     public MyReader(File file, ArrayList<String> strings) throws FileNotFoundException {
         this.strings = strings;
         source = new Scanner(file);
@@ -40,7 +39,7 @@ public class MyReader implements Readable{
             return size;
         }
 
-        System.out.println(i);
+//        System.out.println(i);
         i++;
 
         if(source.hasNextLine()){
@@ -52,7 +51,7 @@ public class MyReader implements Readable{
             }
             if(line.length()==0) return -1;
         }
-                 System.out.println("line before:"+line+lookfor);
+//                 System.out.println("line before:"+line+lookfor);
         // / / :
         if(line.contains("//")){
                 line = line.substring(0,line.indexOf("//"));
@@ -99,7 +98,7 @@ public class MyReader implements Readable{
                 break;
             }
             else{
-                System.out.println("start:"+start+",i:"+i);
+//                System.out.println("start:"+start+",i:"+i);
                 strings.add(str.substring(start+1,i));
                 str = str.substring(0,start+1)+str.substring(i);
                 i=start+2;
@@ -111,7 +110,9 @@ public class MyReader implements Readable{
             str = str.substring(0,cb.length());
         }
         cb.append(str);
-        System.out.println("str:"+str);
+//        System.out.println("str:"+str);
+
+
         return str.length();
     }
 }
