@@ -1,19 +1,22 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
 public class JackTokenizer {
 
+    private ArrayList<String> strings =  new  ArrayList<String>();
     private Scanner source;
+    private int counter = 0;
     private Scanner tokenizer;
     private String token = "";
     private static final String[] SYMBOLS_LOOKUP = {"\\{", "\\}", "\\(", "\\)","\\[","\\]","\\.","\\,",";","\\+","\\-","\\*","/","\\&","\\|","\\<","\\>","\\=","~"};
     private static final String[] SYMBOLS = {"{","}","(",")","[","]",".",",",";","+","-","*","/", "&amp;","|","&lt;","&gt;","=","~"};
 
     public JackTokenizer(File source) throws FileNotFoundException {
-        this.source = new Scanner(source);
-        this.source.useDelimiter("(\\s)|(//(.*))|((/\\*)(.*)(\\*/))");
+        this.source = new Scanner(new MyReader(source,strings));
+        this.source.useDelimiter("(\\s)|(//(.*))");
     }
 
     /**
@@ -55,7 +58,8 @@ public class JackTokenizer {
         }
 
         if(token.startsWith("\"")){
-            token = token.replaceAll("\"", "");
+            token = strings.get(counter);
+            counter++;
             return TokenType.STRING_CONST;
         }
 
