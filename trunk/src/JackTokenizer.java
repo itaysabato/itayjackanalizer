@@ -13,6 +13,7 @@ public class JackTokenizer {
     private String token = "";
     private static final String[] SYMBOLS_LOOKUP = {"\\{", "\\}", "\\(", "\\)","\\[","\\]","\\.","\\,",";","\\+","\\-","\\*","/","\\&","\\|","\\<","\\>","\\=","~"};
     private static final String[] SYMBOLS = {"{","}","(",")","[","]",".",",",";","+","-","*","/", "&amp;","|","&lt;","&gt;","=","~"};
+    private Keyword key;
 
     public JackTokenizer(File source) throws FileNotFoundException {
         this.source = new Scanner(new MyReader(source,strings));
@@ -58,7 +59,7 @@ public class JackTokenizer {
         }
 
         if(token.startsWith("\"")){
-            token = strings.get(counter);
+            token = strings.get(counter).replaceAll("\\&","&amp;").replaceAll("\\<","&lt;").replaceAll("\\>","&gt;");
             counter++;
             return TokenType.STRING_CONST;
         }
@@ -71,6 +72,7 @@ public class JackTokenizer {
 
         for(Keyword keyword : Keyword.values()){
             if(keyword.tag.equals(token)){
+                key = keyword;
                 return TokenType.KEYWORD;
             }
         }
@@ -80,6 +82,10 @@ public class JackTokenizer {
 
     public String token() {
         return token;
+    }
+
+    public Keyword keyword() {
+        return key;
     }
     
     /**

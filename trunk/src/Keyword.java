@@ -33,4 +33,8 @@ public enum Keyword {
 	Keyword(String tag) {
 		this.tag = tag;
 	}
+
+    public String toString() {
+        return tag;
+    }
 }
