@@ -22,7 +22,10 @@ public class CompilationEngine {
             }
             else {
                 Keyword keyword = tokenizer.keyword();
-                if(keyword.equals(Keyword.FIELD) || keyword.equals(Keyword.STATIC)){
+                if(keyword.equals(Keyword.CLASS)){
+                    writer.write(type.wrap(keyword)+"\n");
+                }
+                else if(keyword.equals(Keyword.FIELD) || keyword.equals(Keyword.STATIC)){
                     compileClassVarDec(keyword);
                 }
                 else {
@@ -170,15 +173,15 @@ public class CompilationEngine {
             writer.write(type.wrap(token)+"\n");
 
             if(type.equals(TokenType.SYMBOL)){
-                    String symbol = compileExpression(null, null);
-                    writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
-                    if(symbol.equals(";")){
-                        break;
-                    }
+                String symbol = compileExpression(null, null);
+                writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
+                if(symbol.equals(";")){
+                    break;
                 }
             }
-            writer.write("</letStatement,>\n");
         }
+        writer.write("</letStatement>\n");
+    }
 
     private void compileWhile() throws IOException {
         writer.write("<whileStatement>\n");
@@ -200,7 +203,7 @@ public class CompilationEngine {
             }
             if(type.equals(TokenType.KEYWORD)){
                 compileStatements(tokenizer.keyword());
-                writer.write(type.wrap("}")+"\n");
+                writer.write(TokenType.SYMBOL.wrap("}")+"\n");
                 break;
             }
         }
@@ -226,7 +229,7 @@ public class CompilationEngine {
                 }
             }
         }
-        writer.write("</doStatement,>\n");
+        writer.write("</doStatement>\n");
     }
 
     private void compileExpressionList() throws IOException {
@@ -267,7 +270,7 @@ public class CompilationEngine {
             }
             if(type.equals(TokenType.KEYWORD)){
                 compileStatements(tokenizer.keyword());
-                writer.write(type.wrap("}")+"\n");
+                writer.write(TokenType.SYMBOL.wrap("}")+"\n");
                 break;
             }
         }
@@ -286,7 +289,10 @@ public class CompilationEngine {
                     else writer.write(type.wrap("}")+"\n");
                 }
             }
-            else return token;
+            else {
+                writer.write("</ifStatement>\n");
+                return token;
+            }
         }
         writer.write("</ifStatement>\n");
         return null;
@@ -295,7 +301,13 @@ public class CompilationEngine {
     private void compileReturn() throws IOException {
         writer.write("<returnStatement>\n");
         writer.write(TokenType.KEYWORD.wrap(Keyword.RETURN)+"\n");
-        compileExpression(null, null);   // could be no expression!
+        if(tokenizer.advance()){
+            TokenType type = tokenizer.tokenType();
+            String token = tokenizer.token();
+            if(!type.equals(TokenType.SYMBOL) || !token.equals(";")){
+                   compileExpression(type, token);
+            }
+        }
         writer.write(TokenType.SYMBOL.wrap(";")+"\n");
         writer.write("</returnStatement>\n");
     }
@@ -305,16 +317,16 @@ public class CompilationEngine {
         writer.write("<expression>\n");
         boolean opTurn;
         String next = null;
-        if(type==null) opTurn = false;
-        else opTurn = true;
+        if(type==null && tokenizer.advance())  {
+            type = tokenizer.tokenType();
+            token = tokenizer.token();
+        }
+        opTurn = false;
 
-        tokenizer.advance();
-        type = tokenizer.tokenType();
-        token = tokenizer.token();
         while(true) {
             if(opTurn && !isOp(token)) break;
             else if(opTurn) {
-                writer.write(type.wrap(token)+"\n");
+                writer.write(TokenType.SYMBOL.wrap(token)+"\n");
                 opTurn = false;
             }
             else {
@@ -378,17 +390,18 @@ public class CompilationEngine {
             }
             else if(type.equals(TokenType.SYMBOL)){
                 if(token.equals("(")){
-                    writer.write(type.wrap(token)+"\n");
-                    compileExpressionList();
+                    compileExpression(null,null);
                     writer.write(TokenType.SYMBOL.wrap(")")+"\n");
                     token = null;
                     break;
                 }
-                else if(tokenizer.advance()) {
-                    type = tokenizer.tokenType();
-                    token = tokenizer.token();
-                    token = compileTerm(type, token);
-                    break;
+                else if(token.equals("-") || token.equals("~")){
+                    if(tokenizer.advance()) {
+                        type = tokenizer.tokenType();
+                        token = tokenizer.token();
+                        token = compileTerm(type, token);
+                        break;
+                    }
                 }
             }
             else{
