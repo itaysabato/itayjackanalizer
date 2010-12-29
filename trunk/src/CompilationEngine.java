@@ -35,7 +35,32 @@ public class CompilationEngine {
         writer.write("</class>\n");
     }
 
-    private void CompileSubroutine(Keyword keyword) {
+    private void CompileSubroutine(Keyword keyword) throws IOException {
+        writer.write("<subroutineDec>\n");
+        writer.write(TokenType.KEYWORD.wrap(keyword));
+
+        while(tokenizer.advance()){
+            TokenType type = tokenizer.tokenType();
+            if(!type.equals(TokenType.SYMBOL)){
+                writer.write(type.wrap(tokenizer.token())+"\n");
+            }
+            else {
+                String symbol = tokenizer.token();
+                if(symbol.equals("(")){
+                    writer.write(type.wrap(symbol)+"\n");
+                    compileParameterList();                              
+                }
+                else if(symbol.equals("{")){
+                    writer.write(type.wrap(symbol)+"\n");                       
+                }
+
+            }
+        }
+
+        writer.write("</subroutineDec>\n");
+    }
+
+    private void compileParameterList() {
         //To change body of created methods use File | Settings | File Templates.
     }
 
