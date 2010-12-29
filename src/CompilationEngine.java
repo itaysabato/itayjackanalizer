@@ -177,8 +177,30 @@ public class CompilationEngine {
         //To change body of created methods use File | Settings | File Templates.
     }
 
-    private void compileDo() {
-        //To change body of created methods use File | Settings | File Templates.
+    private void compileDo() throws IOException {
+        writer.write("<doStatement>\n");
+        writer.write(TokenType.KEYWORD.wrap(Keyword.DO)+"\n");
+
+        while(tokenizer.advance()){
+            TokenType type = tokenizer.tokenType();
+            String token = tokenizer.token();
+            writer.write(type.wrap(token)+"\n");
+
+            if(type.equals(TokenType.SYMBOL)){
+                if(token.equals("(")){
+                     String symbol = compileExpressionList();
+                     writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
+                }
+                else if(token.equals(";")){
+                    break;
+                }
+            }
+        }
+        writer.write("</doStatement,>\n");   
+    }
+
+    private String compileExpressionList() {
+        return null;  //To change body of created methods use File | Settings | File Templates.
     }
 
     private void compileIf() {
@@ -189,6 +211,7 @@ public class CompilationEngine {
         writer.write("<returnStatement>\n");
         writer.write(TokenType.KEYWORD.wrap(Keyword.RETURN)+"\n");
         compileExpression();   // could be no expression!
+        writer.write(TokenType.SYMBOL.wrap(";")+"\n");        
         writer.write("</returnStatement,>\n");
     }
 
