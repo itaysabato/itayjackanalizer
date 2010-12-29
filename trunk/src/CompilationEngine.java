@@ -135,7 +135,7 @@ public class CompilationEngine {
         String next;
         next = compileStatement(keyword);
         if(next==null) tokenizer.advance();
-        
+
         while(true){
             TokenType type = tokenizer.tokenType();
             String token = tokenizer.token();
@@ -167,17 +167,18 @@ public class CompilationEngine {
         while(tokenizer.advance()){
             TokenType type = tokenizer.tokenType();
             String token = tokenizer.token();
+            writer.write(type.wrap(token)+"\n");
 
-            if(token.equals("[")){
-                String symbol = compileExpression(null, null);
-                writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
-                if(symbol.equals(";")){
-                    break;
+            if(type.equals(TokenType.SYMBOL)){
+                    String symbol = compileExpression(null, null);
+                    writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
+                    if(symbol.equals(";")){
+                        break;
+                    }
                 }
             }
+            writer.write("</letStatement,>\n");
         }
-        writer.write("</letStatement,>\n");
-    }
 
     private void compileWhile() throws IOException {
         writer.write("<whileStatement>\n");
