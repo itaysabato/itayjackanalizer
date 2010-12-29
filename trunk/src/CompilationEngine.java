@@ -146,7 +146,7 @@ public class CompilationEngine {
         writer.write("</statements>\n");
     }
 
-    private void compileStatement(Keyword keyword) {
+    private void compileStatement(Keyword keyword) throws IOException {
         if(keyword.equals(Keyword.LET))   compileLet();
         if(keyword.equals(Keyword.WHILE))   compileWhile();
         if(keyword.equals(Keyword.DO))   compileDo();
@@ -154,8 +154,23 @@ public class CompilationEngine {
         if(keyword.equals(Keyword.RETURN))   compileReturn();
     }
 
-    private void compileLet() {
-        //To change body of created methods use File | Settings | File Templates.
+    private void compileLet() throws IOException {
+        writer.write("<letStatement>\n");
+        writer.write(TokenType.KEYWORD.wrap(Keyword.LET)+"\n");
+
+        while(tokenizer.advance()){
+            TokenType type = tokenizer.tokenType();
+            writer.write(type.wrap(tokenizer.token())+"\n");
+
+            if(type.equals(TokenType.SYMBOL)){
+                String symbol = compileExpression();
+                writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
+                if(symbol.equals(";")){
+                    break;
+                }
+            }
+        }
+        writer.write("</letStatement,>\n");
     }
 
     private void compileWhile() {
@@ -170,8 +185,16 @@ public class CompilationEngine {
         //To change body of created methods use File | Settings | File Templates.
     }
 
-    private void compileReturn() {
+    private void compileReturn() throws IOException {
+        writer.write("<returnStatement>\n");
+        writer.write(TokenType.KEYWORD.wrap(Keyword.RETURN)+"\n");
+        compileExpression();   // could be no expression!
+        writer.write("</returnStatement,>\n");
+    }
+
+    private String compileExpression() {
         //To change body of created methods use File | Settings | File Templates.
+        return null;
     }
 }
 
