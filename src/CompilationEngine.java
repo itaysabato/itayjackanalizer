@@ -235,7 +235,7 @@ public class CompilationEngine {
         if(tokenizer.advance()){
             TokenType type = tokenizer.tokenType();
             String token = tokenizer.token();
-            
+
             if(!token.equals(")") ){
                 String symbol = compileExpression(type, token);
                 while(symbol.equals(",")){
@@ -281,8 +281,8 @@ public class CompilationEngine {
                     if(type.equals(TokenType.KEYWORD)){
                         compileStatements(tokenizer.keyword());
                         writer.write(type.wrap("}")+"\n");
-                         break;
-                     }
+                        break;
+                    }
                     else writer.write(type.wrap("}")+"\n");
                 }
             }
@@ -303,6 +303,68 @@ public class CompilationEngine {
     private String compileExpression(TokenType type, String token) {
         //To change body of created methods use File | Settings | File Templates.
         return null;
+    }
+
+    private String compileTerm(TokenType type, String token) throws IOException {
+        writer.write("<term>\n");
+        do {
+            writer.write(type.wrap(token)+"\n");
+            if(type.equals(TokenType.IDENTIFIER)){
+                if(tokenizer.advance()){
+                    type = tokenizer.tokenType();
+                    token = tokenizer.token();
+                    if(type.equals(TokenType.SYMBOL)){
+                        if(token.equals("[")){
+                            writer.write(type.wrap(token)+"\n");
+                            token = compileExpression(null,null);
+                            writer.write(TokenType.SYMBOL.wrap(token)+"\n");
+                            token = null;
+                            break;
+                        }
+                        else if(token.equals("(")){
+                            writer.write(type.wrap(token)+"\n");
+                            compileExpressionList();
+                            writer.write(TokenType.SYMBOL.wrap(")")+"\n");
+                            token = null;
+                            break;
+                        }
+                        else if(token.equals(".")){
+                            writer.write(type.wrap(token)+"\n");
+                            if(tokenizer.advance()){
+                                type = tokenizer.tokenType();
+                                token = tokenizer.token();
+                            }
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                }
+            }
+            else if(type.equals(TokenType.SYMBOL)){
+                if(token.equals("(")){
+                    writer.write(type.wrap(token)+"\n");
+                    compileExpressionList();
+                    writer.write(TokenType.SYMBOL.wrap(")")+"\n");
+                    token = null;
+                    break;
+                }
+                else if(tokenizer.advance()) {
+                    type = tokenizer.tokenType();
+                    token = tokenizer.token();
+                    token = compileTerm(type, token);
+                    break;
+                }
+            }
+            else{
+                token = null;
+                break;
+            }
+
+        } while(true);
+
+        writer.write("</term>\n");
+        return token;
     }
 }
 
