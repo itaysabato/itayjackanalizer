@@ -1,4 +1,3 @@
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -65,7 +64,7 @@ public class CompilationEngine {
         writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
 
         while(tokenizer.advance()){
-             TokenType type = tokenizer.tokenType();
+            TokenType type = tokenizer.tokenType();
             if(type.equals(TokenType.KEYWORD)){
                 Keyword keyword = tokenizer.keyword();
                 if(keyword.equals(Keyword.VAR)){
@@ -87,7 +86,7 @@ public class CompilationEngine {
     }
 
     private void compileParameterList() throws IOException {
-       writer.write("<parameterList>\n");
+        writer.write("<parameterList>\n");
 
         while(tokenizer.advance()){
             TokenType type = tokenizer.tokenType();
@@ -163,7 +162,7 @@ public class CompilationEngine {
             writer.write(type.wrap(tokenizer.token())+"\n");
 
             if(type.equals(TokenType.SYMBOL)){
-                String symbol = compileExpression();
+                String symbol = compileExpression(null, null);
                 writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
                 if(symbol.equals(";")){
                     break;
@@ -188,19 +187,33 @@ public class CompilationEngine {
 
             if(type.equals(TokenType.SYMBOL)){
                 if(token.equals("(")){
-                     String symbol = compileExpressionList();
-                     writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
+                    compileExpressionList();
+                    writer.write(TokenType.SYMBOL.wrap(")")+"\n");
                 }
                 else if(token.equals(";")){
                     break;
                 }
             }
         }
-        writer.write("</doStatement,>\n");   
+        writer.write("</doStatement,>\n");
     }
 
-    private String compileExpressionList() {
-        return null;  //To change body of created methods use File | Settings | File Templates.
+    private void compileExpressionList() throws IOException {
+        writer.write("<expressionList>\n");
+
+        if(tokenizer.advance()){
+            TokenType type = tokenizer.tokenType();
+            String token = tokenizer.token();
+            
+            if(!token.equals(")") ){
+                String symbol = compileExpression(type, token);
+                while(symbol.equals(",")){
+                    writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
+                    symbol = compileExpression(null, null);
+                }
+            }
+        }
+        writer.write("</expressionList>\n");
     }
 
     private void compileIf() {
@@ -210,12 +223,12 @@ public class CompilationEngine {
     private void compileReturn() throws IOException {
         writer.write("<returnStatement>\n");
         writer.write(TokenType.KEYWORD.wrap(Keyword.RETURN)+"\n");
-        compileExpression();   // could be no expression!
-        writer.write(TokenType.SYMBOL.wrap(";")+"\n");        
+        compileExpression(null, null);   // could be no expression!
+        writer.write(TokenType.SYMBOL.wrap(";")+"\n");
         writer.write("</returnStatement,>\n");
     }
 
-    private String compileExpression() {
+    private String compileExpression(TokenType type, String token) {
         //To change body of created methods use File | Settings | File Templates.
         return null;
     }
