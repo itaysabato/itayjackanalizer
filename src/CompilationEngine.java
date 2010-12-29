@@ -210,7 +210,7 @@ public class CompilationEngine {
                 		token = tokenizer.token();
                         compileStatements(null);
                 	}
-                    writer.write(TokenType.SYMBOL.wrap(token)+"\n");
+                    writer.write(TokenType.SYMBOL.wrap("}")+"\n");
                     break;
                 }
             }
@@ -285,7 +285,7 @@ public class CompilationEngine {
                 		token = tokenizer.token();
                         compileStatements(null);
                 	}
-                    writer.write(TokenType.SYMBOL.wrap(token)+"\n");
+                    writer.write(TokenType.SYMBOL.wrap("}")+"\n");
                     break;
                 }
             }
@@ -311,7 +311,7 @@ public class CompilationEngine {
                         		token = tokenizer.token();
                                 compileStatements(null);
                         	}
-                            writer.write(TokenType.SYMBOL.wrap(token)+"\n");
+                            writer.write(TokenType.SYMBOL.wrap("}")+"\n");
                             break;
                         }
                     }

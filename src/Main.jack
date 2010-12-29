@@ -13,7 +13,7 @@ class Main {
 		if(2>-1){}
 
 		if(true=~false){
-		}else{do doF("// bla");};
+		}else{do doF("// bla");}
 
 		do game.methods("");
 		do game.methods("/* //la la la */");
