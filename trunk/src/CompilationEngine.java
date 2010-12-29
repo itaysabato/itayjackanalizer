@@ -140,14 +140,37 @@ public class CompilationEngine {
             String token = tokenizer.token();
 
             if(!type.equals(TokenType.KEYWORD) ) break;
-
-            compileStatement(tokenizer.keyword());
+            else compileStatement(tokenizer.keyword());
         }
 
         writer.write("</statements>\n");
     }
 
     private void compileStatement(Keyword keyword) {
+        if(keyword.equals(Keyword.LET))   compileLet();
+        if(keyword.equals(Keyword.WHILE))   compileWhile();
+        if(keyword.equals(Keyword.DO))   compileDo();
+        if(keyword.equals(Keyword.IF))   compileIf();
+        if(keyword.equals(Keyword.RETURN))   compileReturn();
+    }
+
+    private void compileLet() {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
+    private void compileWhile() {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
+    private void compileDo() {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
+    private void compileIf() {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
+    private void compileReturn() {
         //To change body of created methods use File | Settings | File Templates.
     }
 }
