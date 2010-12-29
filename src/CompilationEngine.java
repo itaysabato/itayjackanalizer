@@ -24,10 +24,10 @@ public class CompilationEngine {
             else {
                 Keyword keyword = tokenizer.keyword();
                 if(keyword.equals(Keyword.FIELD) || keyword.equals(Keyword.STATIC)){
-                    CompileClassVarDec(keyword);
+                    compileClassVarDec(keyword);
                 }
                 else {
-                    CompileSubroutine(keyword);
+                    compileSubroutine(keyword);
                 }
             }
         }
@@ -35,7 +35,7 @@ public class CompilationEngine {
         writer.write("</class>\n");
     }
 
-    private void CompileSubroutine(Keyword keyword) throws IOException {
+    private void compileSubroutine(Keyword keyword) throws IOException {
         writer.write("<subroutineDec>\n");
         writer.write(TokenType.KEYWORD.wrap(keyword));
 
@@ -86,20 +86,29 @@ public class CompilationEngine {
         writer.write("</subroutineBody>\n");
     }
 
-    private void compileStatements(Keyword keyword) {
-        //To change body of created methods use File | Settings | File Templates.
+    private void compileParameterList() throws IOException {
+       writer.write("<parameterList>\n");
+
+        while(tokenizer.advance()){
+            TokenType type = tokenizer.tokenType();
+            String token = tokenizer.token();
+            if(token.equals(")") ) break;
+            writer.write(type.wrap(token)+"\n");
+        }
+
+        writer.write("</parameterList>\n");
     }
 
-    private void compileVarDec(Keyword keyword) {
-        //To change body of created methods use File | Settings | File Templates.
+    private void compileClassVarDec(Keyword keyword) throws IOException {
+        compileTemplateVarDec(keyword,"classVarDec");
     }
 
-    private void compileParameterList() {
-        //To change body of created methods use File | Settings | File Templates.
+    private void compileVarDec(Keyword keyword) throws IOException {
+        compileTemplateVarDec(keyword,"varDec");
     }
 
-    private void CompileClassVarDec(Keyword keyword) throws IOException {
-        writer.write("<classVarDec>\n");
+    private void compileTemplateVarDec(Keyword keyword,String name) throws IOException {
+        writer.write("<"+name+">\n");
 
         writer.write(TokenType.KEYWORD.wrap(keyword+"\n"));
 
@@ -113,7 +122,34 @@ public class CompilationEngine {
             writer.write(type.wrap(token)+"\n");
         }
 
-        writer.write("</classVarDec>\n");
+        writer.write("</"+name+">\n");
+    }
 
+    private void compileStatements(Keyword keyword) throws IOException {
+
+        writer.write("<statements>\n");
+
+        if(keyword==null){
+            writer.write("</statements>\n");
+        }
+
+        compileStatement(keyword);
+
+        while(tokenizer.advance()){
+            TokenType type = tokenizer.tokenType();
+            String token = tokenizer.token();
+
+            if(!type.equals(TokenType.KEYWORD) ) break;
+
+            compileStatement(tokenizer.keyword());
+        }
+
+        writer.write("</statements>\n");
+    }
+
+    private void compileStatement(Keyword keyword) {
+        //To change body of created methods use File | Settings | File Templates.
     }
 }
+
+
