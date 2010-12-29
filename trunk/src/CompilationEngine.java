@@ -36,7 +36,7 @@ public class CompilationEngine {
 
     private void compileSubroutine(Keyword keyword) throws IOException {
         writer.write("<subroutineDec>\n");
-        writer.write(TokenType.KEYWORD.wrap(keyword));
+        writer.write(TokenType.KEYWORD.wrap(keyword)+"\n");
 
         while(tokenizer.advance()){
             TokenType type = tokenizer.tokenType();
@@ -132,11 +132,10 @@ public class CompilationEngine {
             writer.write("</statements>\n");
             return;
         }
-
-        compileStatement(keyword);
-
         String next;
-        tokenizer.advance();
+        next = compileStatement(keyword);
+        if(next==null) tokenizer.advance();
+        
         while(true){
             TokenType type = tokenizer.tokenType();
             String token = tokenizer.token();
@@ -182,7 +181,7 @@ public class CompilationEngine {
 
     private void compileWhile() throws IOException {
         writer.write("<whileStatement>\n");
-        writer.write(TokenType.KEYWORD.wrap("while")+"\n");
+        writer.write(TokenType.KEYWORD.wrap(Keyword.WHILE)+"\n");
         String closer;
         TokenType type;
         String token;
@@ -249,7 +248,7 @@ public class CompilationEngine {
 
     private String compileIf() throws IOException {
         writer.write("<ifStatement>\n");
-        writer.write(TokenType.KEYWORD.wrap("if")+"\n");
+        writer.write(TokenType.KEYWORD.wrap(Keyword.IF)+"\n");
         String closer;
         TokenType type;
         String token;
@@ -297,12 +296,47 @@ public class CompilationEngine {
         writer.write(TokenType.KEYWORD.wrap(Keyword.RETURN)+"\n");
         compileExpression(null, null);   // could be no expression!
         writer.write(TokenType.SYMBOL.wrap(";")+"\n");
-        writer.write("</returnStatement,>\n");
+        writer.write("</returnStatement>\n");
     }
 
-    private String compileExpression(TokenType type, String token) {
-        //To change body of created methods use File | Settings | File Templates.
-        return null;
+    private String compileExpression(TokenType type, String token) throws IOException {
+
+        writer.write("<expression>\n");
+        boolean opTurn;
+        String next = null;
+        if(type==null) opTurn = false;
+        else opTurn = true;
+
+        tokenizer.advance();
+        type = tokenizer.tokenType();
+        token = tokenizer.token();
+        while(true) {
+            if(opTurn && !isOp(token)) break;
+            else if(opTurn) {
+                writer.write(type.wrap(token)+"\n");
+                opTurn = false;
+            }
+            else {
+                token = compileTerm(type,token);
+                opTurn = true;
+                if(token!=null)  continue;
+            }
+            tokenizer.advance();
+            type = tokenizer.tokenType();
+            token = tokenizer.token();
+        }
+
+        writer.write("</expression>\n");
+        return token;
+    }
+
+    private boolean isOp(String token) {
+        String[] ops = {"+","-","*","/", "&amp;","|","&lt;","&gt;","="};
+        int i = 0;
+        for(;i<ops.length;i++) {
+            if(token.equals(ops[i])) return true;
+        }
+        return false;
     }
 
     private String compileTerm(TokenType type, String token) throws IOException {
