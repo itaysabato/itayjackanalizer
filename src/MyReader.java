@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Rotmus
  * Date: 27/12/2010
  * Time: 21:24:06
- * To change this template use File | Settings | File Templates.
  */
 public class MyReader implements Readable{
 
@@ -93,12 +91,12 @@ public class MyReader implements Readable{
             start = str.indexOf('"',i);
             i =   str.indexOf('"',start+1);
             if(i+1>=str.length()){
-                strings.add(str.substring(start+1,i).replaceAll("א","//").replaceAll("ב","/*").replaceAll("ג","*/"));
+                strings.add(str.substring(start+1,i).replaceAll("\u05D0","//").replaceAll("\u05D1","/*").replaceAll("\u05D2","*/"));
             	str = str.substring(0,start+1)+"\"";
                 break;
             }
             else{
-                strings.add(str.substring(start+1,i).replaceAll("א","//").replaceAll("ב","/*").replaceAll("ג","*/"));
+                strings.add(str.substring(start+1,i).replaceAll("\u05D0","//").replaceAll("\u05D1","/*").replaceAll("\u05D2","*/"));
                 str = str.substring(0,start+1)+str.substring(i);
                 i=start+2;
             }
@@ -119,9 +117,9 @@ public class MyReader implements Readable{
 		int merch = 0;
 		int merch2 = 0;
 		String type = null;
-		if(str.equals("//")) type = "א";
-		else if(str.equals("/*")) type = "ב";
-		else if(str.equals("*/")) type = "ג";
+		if(str.equals("//")) type = "\u05D0";
+		else if(str.equals("/*")) type = "\u05D1";
+		else if(str.equals("*/")) type = "\u05D2";
 		
 		if(line.isEmpty()) return line;
 		

@@ -25,7 +25,7 @@ public class JackAnalyzer {
 
     private static void compile(File input, File location) throws FileNotFoundException {
         JackTokenizer tokenizer = new JackTokenizer(input);
-        File output = new File(location, input.getName().replaceAll(".jack", ".my.xml"));
+        File output = new File(location, input.getName().replaceAll(".jack", ".xml"));
 
         FileWriter writer = null;
         try {
