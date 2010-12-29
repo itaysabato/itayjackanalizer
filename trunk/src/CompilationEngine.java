@@ -109,7 +109,7 @@ public class CompilationEngine {
     private void compileTemplateVarDec(Keyword keyword,String name) throws IOException {
         writer.write("<"+name+">\n");
 
-        writer.write(TokenType.KEYWORD.wrap(keyword+"\n"));
+        writer.write(TokenType.KEYWORD.wrap(keyword)+"\n");
 
         while(tokenizer.advance()){
             TokenType type = tokenizer.tokenType();
@@ -130,27 +130,35 @@ public class CompilationEngine {
 
         if(keyword==null){
             writer.write("</statements>\n");
+            return;
         }
 
         compileStatement(keyword);
 
-        while(tokenizer.advance()){
+        String next;
+        tokenizer.advance();
+        while(true){
             TokenType type = tokenizer.tokenType();
             String token = tokenizer.token();
 
             if(!type.equals(TokenType.KEYWORD) ) break;
-            else compileStatement(tokenizer.keyword());
+            else{
+                next = compileStatement(tokenizer.keyword());
+                if(next==null)  tokenizer.advance();
+                else if(next.equals("}")) break;
+            }
         }
 
         writer.write("</statements>\n");
     }
 
-    private void compileStatement(Keyword keyword) throws IOException {
+    private String compileStatement(Keyword keyword) throws IOException {
         if(keyword.equals(Keyword.LET))   compileLet();
         if(keyword.equals(Keyword.WHILE))   compileWhile();
         if(keyword.equals(Keyword.DO))   compileDo();
-        if(keyword.equals(Keyword.IF))   compileIf();
+        if(keyword.equals(Keyword.IF)) return compileIf();
         if(keyword.equals(Keyword.RETURN))   compileReturn();
+        return null;
     }
 
     private void compileLet() throws IOException {
@@ -159,9 +167,9 @@ public class CompilationEngine {
 
         while(tokenizer.advance()){
             TokenType type = tokenizer.tokenType();
-            writer.write(type.wrap(tokenizer.token())+"\n");
+            String token = tokenizer.token();
 
-            if(type.equals(TokenType.SYMBOL)){
+            if(token.equals("[")){
                 String symbol = compileExpression(null, null);
                 writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
                 if(symbol.equals(";")){
@@ -172,8 +180,31 @@ public class CompilationEngine {
         writer.write("</letStatement,>\n");
     }
 
-    private void compileWhile() {
-        //To change body of created methods use File | Settings | File Templates.
+    private void compileWhile() throws IOException {
+        writer.write("<whileStatement>\n");
+        writer.write(TokenType.KEYWORD.wrap("while")+"\n");
+        String closer;
+        TokenType type;
+        String token;
+
+        while(tokenizer.advance()){
+            type = tokenizer.tokenType();
+            token = tokenizer.token();
+            if(token.equals("(") ){
+                writer.write(type.wrap(token)+"\n");
+                closer = compileExpression(null,null);
+                writer.write(type.wrap(closer)+"\n");
+            }
+            if(token.equals("{")){
+                writer.write(type.wrap(token)+"\n");
+            }
+            if(type.equals(TokenType.KEYWORD)){
+                compileStatements(tokenizer.keyword());
+                writer.write(type.wrap("}")+"\n");
+                break;
+            }
+        }
+        writer.write("</whileStatement>\n");
     }
 
     private void compileDo() throws IOException {
@@ -216,8 +247,49 @@ public class CompilationEngine {
         writer.write("</expressionList>\n");
     }
 
-    private void compileIf() {
-        //To change body of created methods use File | Settings | File Templates.
+    private String compileIf() throws IOException {
+        writer.write("<ifStatement>\n");
+        writer.write(TokenType.KEYWORD.wrap("if")+"\n");
+        String closer;
+        TokenType type;
+        String token;
+
+        while(tokenizer.advance()){
+            type = tokenizer.tokenType();
+            token = tokenizer.token();
+            if(token.equals("(") ){
+                writer.write(type.wrap(token)+"\n");
+                closer = compileExpression(null,null);
+                writer.write(type.wrap(closer)+"\n");
+            }
+            if(token.equals("{")){
+                writer.write(type.wrap(token)+"\n");
+            }
+            if(type.equals(TokenType.KEYWORD)){
+                compileStatements(tokenizer.keyword());
+                writer.write(type.wrap("}")+"\n");
+                break;
+            }
+        }
+        if(tokenizer.advance()) {
+            type = tokenizer.tokenType();
+            token = tokenizer.token();
+            if(token.equals("else")){
+                while(tokenizer.advance()) {
+                    type = tokenizer.tokenType();
+                    token = tokenizer.token();
+                    if(type.equals(TokenType.KEYWORD)){
+                        compileStatements(tokenizer.keyword());
+                        writer.write(type.wrap("}")+"\n");
+                         break;
+                     }
+                    else writer.write(type.wrap("}")+"\n");
+                }
+            }
+            else return token;
+        }
+        writer.write("</ifStatement>\n");
+        return null;
     }
 
     private void compileReturn() throws IOException {
