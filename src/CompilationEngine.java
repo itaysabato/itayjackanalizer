@@ -27,11 +27,11 @@ public class CompilationEngine {
                     CompileClassVarDec(keyword);
                 }
                 else {
-                      CompileSubroutine(keyword);
+                    CompileSubroutine(keyword);
                 }
             }
         }
-        
+
         writer.write("</class>\n");
     }
 
@@ -48,16 +48,50 @@ public class CompilationEngine {
                 String symbol = tokenizer.token();
                 if(symbol.equals("(")){
                     writer.write(type.wrap(symbol)+"\n");
-                    compileParameterList();                              
+                    compileParameterList();
+                    writer.write(type.wrap(")")+"\n");
                 }
                 else if(symbol.equals("{")){
-                    writer.write(type.wrap(symbol)+"\n");                       
+                    compileSubroutineBody(symbol);
+                    break;
                 }
+            }
+        }
+        writer.write("</subroutineDec>\n");
+    }
 
+    private void compileSubroutineBody(String symbol) throws IOException {
+        writer.write("<subroutineBody>\n");
+        writer.write(TokenType.SYMBOL.wrap(symbol)+"\n");
+
+        while(tokenizer.advance()){
+             TokenType type = tokenizer.tokenType();
+            if(type.equals(TokenType.KEYWORD)){
+                Keyword keyword = tokenizer.keyword();
+                if(keyword.equals(Keyword.VAR)){
+                    compileVarDec(keyword);
+                }
+                else {
+                    compileStatements(keyword);
+                    break;
+                }
+            }
+            else {
+                compileStatements(null);
+                break;
             }
         }
 
-        writer.write("</subroutineDec>\n");
+        writer.write(TokenType.SYMBOL.wrap("}")+"\n");
+        writer.write("</subroutineBody>\n");
+    }
+
+    private void compileStatements(Keyword keyword) {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
+    private void compileVarDec(Keyword keyword) {
+        //To change body of created methods use File | Settings | File Templates.
     }
 
     private void compileParameterList() {
@@ -80,6 +114,6 @@ public class CompilationEngine {
         }
 
         writer.write("</classVarDec>\n");
-        
+
     }
 }
