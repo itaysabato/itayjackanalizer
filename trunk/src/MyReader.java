@@ -16,7 +16,6 @@ public class MyReader implements Readable{
 
     private ArrayList<String> strings;
     private Scanner source;
-    private int i= 0;
     private String buf="";
    private  boolean lookfor = false ;
     
@@ -39,19 +38,20 @@ public class MyReader implements Readable{
             return size;
         }
 
-//        System.out.println(i);
-        i++;
 
         if(source.hasNextLine()){
             line = source.nextLine();
         }
         else{
             while(source.hasNext()){
-                line+=" "+source.next();  //todo read the end right
+                line+=" "+source.next();  
             }
             if(line.length()==0) return -1;
         }
-//                 System.out.println("line before:"+line+lookfor);
+        line = change(line,"//");
+        line = change(line,"/*");
+        line = change(line,"*/");
+        
         // / / :
         if(line.contains("//")){
                 line = line.substring(0,line.indexOf("//"));
@@ -93,13 +93,12 @@ public class MyReader implements Readable{
             start = str.indexOf('"',i);
             i =   str.indexOf('"',start+1);
             if(i+1>=str.length()){
-                strings.add(str.substring(start+1,i));
-                str = str.substring(0,start+1)+"\"";
+                strings.add(str.substring(start+1,i).replaceAll("א","//").replaceAll("ב","/*").replaceAll("ג","*/"));
+            	str = str.substring(0,start+1)+"\"";
                 break;
             }
             else{
-//                System.out.println("start:"+start+",i:"+i);
-                strings.add(str.substring(start+1,i));
+                strings.add(str.substring(start+1,i).replaceAll("א","//").replaceAll("ב","/*").replaceAll("ג","*/"));
                 str = str.substring(0,start+1)+str.substring(i);
                 i=start+2;
             }
@@ -110,9 +109,36 @@ public class MyReader implements Readable{
             str = str.substring(0,cb.length());
         }
         cb.append(str);
-//        System.out.println("str:"+str);
-
 
         return str.length();
     }
+
+	private String change(String line,String str) {
+		int from = 0;
+		int token = 0;
+		int merch = 0;
+		int merch2 = 0;
+		String type = null;
+		if(str.equals("//")) type = "א";
+		else if(str.equals("/*")) type = "ב";
+		else if(str.equals("*/")) type = "ג";
+		
+		if(line.isEmpty()) return line;
+		
+		while(from<line.length()){
+			merch = line.indexOf("\"", from);
+			if(merch!=-1){
+				token = line.indexOf(str, merch);
+				if(token==-1) break;
+				merch2 = line.indexOf("\"", merch+1);
+				if(merch2==-1) break;
+				if(token<merch2)
+					line = line.substring(0,token)+type+line.substring(token+2);
+				from = merch2+1;
+			}
+			else break;
+		}
+		return line;
+		
+	}
 }
