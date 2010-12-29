@@ -39,7 +39,22 @@ public class CompilationEngine {
         //To change body of created methods use File | Settings | File Templates.
     }
 
-    private void CompileClassVarDec(Keyword keyword) {
-        // http://www1.idc.ac.il/tecs/book/chapter10.pdf
+    private void CompileClassVarDec(Keyword keyword) throws IOException {
+        writer.write("<classVarDec>\n");
+
+        writer.write(TokenType.KEYWORD.wrap(keyword+"\n"));
+
+        while(tokenizer.advance()){
+            TokenType type = tokenizer.tokenType();
+            String token = tokenizer.token();
+            if(token.equals(";") ){
+                writer.write(type.wrap(token)+"\n");
+                break;
+            }
+            writer.write(type.wrap(token)+"\n");
+        }
+
+        writer.write("</classVarDec>\n");
+        
     }
 }
