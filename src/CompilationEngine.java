@@ -200,11 +200,19 @@ public class CompilationEngine {
             }
             if(token.equals("{")){
                 writer.write(type.wrap(token)+"\n");
-            }
-            if(type.equals(TokenType.KEYWORD)){
-                compileStatements(tokenizer.keyword());
-                writer.write(TokenType.SYMBOL.wrap("}")+"\n");
-                break;
+                
+                if(tokenizer.advance()){
+                	type = tokenizer.tokenType();
+                	if(type.equals(TokenType.KEYWORD)){
+                        compileStatements(tokenizer.keyword());
+                	}
+                	else {
+                		token = tokenizer.token();
+                        compileStatements(null);
+                	}
+                    writer.write(TokenType.SYMBOL.wrap(token)+"\n");
+                    break;
+                }
             }
         }
         writer.write("</whileStatement>\n");
@@ -267,26 +275,46 @@ public class CompilationEngine {
             }
             if(token.equals("{")){
                 writer.write(type.wrap(token)+"\n");
+                
+                if(tokenizer.advance()){
+                	type = tokenizer.tokenType();
+                	if(type.equals(TokenType.KEYWORD)){
+                        compileStatements(tokenizer.keyword());
+                	}
+                	else {
+                		token = tokenizer.token();
+                        compileStatements(null);
+                	}
+                    writer.write(TokenType.SYMBOL.wrap(token)+"\n");
+                    break;
+                }
             }
-            if(type.equals(TokenType.KEYWORD)){
-                compileStatements(tokenizer.keyword());
-                writer.write(TokenType.SYMBOL.wrap("}")+"\n");
-                break;
-            }
+            
         }
         if(tokenizer.advance()) {
             type = tokenizer.tokenType();
             token = tokenizer.token();
-            if(token.equals("else")){
+            if(token.equals(Keyword.ELSE.tag)){
+            	writer.write(TokenType.KEYWORD.wrap(Keyword.ELSE)+"\n");
                 while(tokenizer.advance()) {
                     type = tokenizer.tokenType();
                     token = tokenizer.token();
-                    if(type.equals(TokenType.KEYWORD)){
-                        compileStatements(tokenizer.keyword());
-                        writer.write(type.wrap("}")+"\n");
-                        break;
+                    if(token.equals("{")){
+                        writer.write(type.wrap(token)+"\n");
+                        
+                        if(tokenizer.advance()){
+                        	type = tokenizer.tokenType();
+                        	if(type.equals(TokenType.KEYWORD)){
+                                compileStatements(tokenizer.keyword());
+                        	}
+                        	else {
+                        		token = tokenizer.token();
+                                compileStatements(null);
+                        	}
+                            writer.write(TokenType.SYMBOL.wrap(token)+"\n");
+                            break;
+                        }
                     }
-                    else writer.write(type.wrap("}")+"\n");
                 }
             }
             else {

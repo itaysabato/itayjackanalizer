@@ -33,15 +33,6 @@ public class JackAnalyzer {
             CompilationEngine compiler = new CompilationEngine(tokenizer, writer);
             compiler.compileClass();
 
-
-//            writer.write("<tokens>\n");
-//
-//            while(tokenizer.advance()){
-//                TokenType type = tokenizer.tokenType();
-//                String line = type.wrap(tokenizer.token());
-//                writer.write(line+"\n");
-//            }
-//            writer.write("</tokens>\n");
         }
         catch (IOException e) {
             System.out.println("Failed writing to output stream: "+e.getMessage());
